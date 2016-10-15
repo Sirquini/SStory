@@ -1,0 +1,6 @@
+# Raw Sounds are excluded due to size
+/souds
+/souds_raw
+# Generated executables, object files
+*.obj
+*.exe

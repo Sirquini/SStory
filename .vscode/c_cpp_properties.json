@@ -2,32 +2,58 @@
     "configurations": [
         {
             "name": "Mac",
-            "includePath": ["/usr/include"],
-            "browse" : {
-                "limitSymbolsToIncludedHeaders" : true,
-                "databaseFilename" : ""
-            }
+            "includePath": [
+                "/usr/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include"
+                ]
+            },
+            "intelliSenseMode": "clang-x64",
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ]
         },
         {
             "name": "Linux",
-            "includePath": ["/usr/include"],
-            "browse" : {
-                "limitSymbolsToIncludedHeaders" : true,
-                "databaseFilename" : ""
-            }
+            "includePath": [
+                "/usr/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include"
+                ]
+            },
+            "intelliSenseMode": "clang-x64"
         },
         {
             "name": "Win32",
-            "includePath": ["c:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include", "c:/Program Files (x86)/OpenAL 1.1 SDK/include"],
-            "browse" : {
-                "limitSymbolsToIncludedHeaders" : true,
-                "databaseFilename" : ""
-            }
+            "includePath": [
+                "c:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt",
+                "c:/Program Files (x86)/OpenAL 1.1 SDK/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "c:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
+                    "c:/Program Files (x86)/OpenAL 1.1 SDK/include"
+                ]
+            },
+            "intelliSenseMode": "msvc-x64"
         }
     ],
-    "clang_format" : {
-        "style" : "file",
-        "fallback-style" : "LLVM",
-        "sort-includes" : false
-    }
+    "clang_format": {
+        "style": "file",
+        "fallback-style": "LLVM",
+        "sort-includes": false
+    },
+    "version": 3
 }

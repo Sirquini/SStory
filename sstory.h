@@ -93,7 +93,7 @@ protected:
     bool withChoices;
 public:
     SContentBody (std::string b, std::vector<SChoice> c, int s)
-    : body(b), sound(s), choices(c), withSound(true), withChoices(true)
+    : body(b), choices(c), sound(s), withSound(true), withChoices(true)
     {}
 
     SContentBody (std::string b, int s)

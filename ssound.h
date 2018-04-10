@@ -6,18 +6,16 @@
  * Released under The MIT License
  *
  */
+#ifndef SSound_h
+#define SSound_h
 
 // OpenAl libraries
 #ifdef _MSC_VER
 #include <al.h>
-#include <alc.h>
 #else
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
+#include <AL/al.h>
+#include <AL/alut.h>
 #endif // _MSC_VER
-
-#include "alut.h"
-
 
 class SBuffer {
 public:
@@ -39,7 +37,7 @@ public:
         //std::cout << "Loaded buffer " << path << std::endl;
 		alGenBuffers(1, &Buffer);
 		
-		alutLoadWAVFile((ALbyte *)path.c_str(), &format, &data, &size, &freq);
+		alutLoadWAVFile((ALbyte *)path.c_str(), &format, &data, &size, &freq, &loop);
 		alBufferData(Buffer, format, data, size, freq);
 		alutUnloadWAV(format, data, size, freq);
 
@@ -359,3 +357,5 @@ public:
         }
     }   
 };
+
+#endif // SSound_h

@@ -4,3 +4,6 @@
 # Generated executables, object files
 *.obj
 *.exe
+*.out
+# Testing Game
+ExGame

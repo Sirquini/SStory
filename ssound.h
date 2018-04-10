@@ -10,12 +10,7 @@
 #define SSound_h
 
 // OpenAl libraries
-#ifdef _MSC_VER
-#include <al.h>
-#else
-#include <AL/al.h>
 #include <AL/alut.h>
-#endif // _MSC_VER
 
 class SBuffer {
 public:

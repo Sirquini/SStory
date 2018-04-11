@@ -88,7 +88,7 @@ class SContentBody {
 protected:
     SText body;
     std::vector< SChoice > choices;
-    SSound sound;
+    SSound::Sound sound;
     bool withSound;
     bool withChoices;
 public:

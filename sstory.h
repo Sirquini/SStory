@@ -37,12 +37,12 @@ class Text
         std::cout << body << std::endl;
     }
 
-    void pprint(std::string prepend) const
+    void pprint(const std::string &prepend) const
     {
         std::cout << prepend << " : " << body << std::endl;
     }
 
-    void pprint(Text prepend) const
+    void pprint(const Text &prepend) const
     {
         std::cout << prepend.body << " : " << body << std::endl;
     }
@@ -128,14 +128,16 @@ class ContentBody
                 choices[i].print(i + 1);
             }
             uInput = read_choice(nChoices);
-            /* Unvalidated input, generates loop on invalid input
+            /* 
+            // Unvalidated input, generates loop on invalid input
             while (uInput == 0)
             {
                 std::cout << "> ";
                 std::cin >> uInput;
                 if(uInput < 0 || uInput > nChoices )
                     uInput = 0;
-            }*/
+            }
+            */
             // Ignore the never read newline character.
             std::cin.ignore();
             return choices[uInput - 1].execute();
@@ -198,10 +200,9 @@ class Story
             else
             {
                 currentScene = scenes[currentLabel];
-                int nContent = currentScene.size();
-                for (int i = 0; i < nContent; ++i)
+                for (const auto &content : currentScene)
                 {
-                    currentLabel = currentScene[i].play();
+                    currentLabel = content.play();
                 }
             }
         }

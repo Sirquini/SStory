@@ -19,14 +19,17 @@
 // Sound handling with OpenAl
 #include "ssound.h"
 
-class SText
+namespace SStory
+{
+
+class Text
 {
     //! Basic String Wrapper
   protected:
     std::string body;
 
   public:
-    SText(std::string s)
+    Text(std::string s)
         : body(s) {}
     //! Prints the body text in standar output
     void print() const
@@ -39,7 +42,7 @@ class SText
         std::cout << prepend << " : " << body << std::endl;
     }
 
-    void pprint(SText prepend) const
+    void pprint(Text prepend) const
     {
         std::cout << prepend.body << " : " << body << std::endl;
     }
@@ -50,20 +53,20 @@ class SText
     }
 };
 
-class SChoice
+class Choice
 {
     //! Abstraction for the notion of multiple choices in a text adventure game.
   protected:
     std::string label;
-    SText displayText;
-    SText complement;
+    Text displayText;
+    Text complement;
     bool withComplement;
 
   public:
-    SChoice(std::string l, std::string dt, std::string c)
+    Choice(std::string l, std::string dt, std::string c)
         : label(l), displayText(dt), complement(c), withComplement(true) {}
 
-    SChoice(std::string l, std::string dt)
+    Choice(std::string l, std::string dt)
         : label(l), displayText(dt), complement(""), withComplement(false) {}
 
     void print(int n) const
@@ -85,27 +88,27 @@ class SChoice
     }
 };
 
-class SContentBody
+class ContentBody
 {
     //! The basic structure of a Sub Scene
   protected:
-    SText body;
-    std::vector<SChoice> choices;
+    Text body;
+    std::vector<Choice> choices;
     SSound::Sound sound;
     bool withSound;
     bool withChoices;
 
   public:
-    SContentBody(std::string b, std::vector<SChoice> c, int s)
+    ContentBody(std::string b, std::vector<Choice> c, int s)
         : body(b), choices(c), sound(s), withSound(true), withChoices(true) {}
 
-    SContentBody(std::string b, int s)
+    ContentBody(std::string b, int s)
         : body(b), sound(s), withSound(true), withChoices(false) {}
 
-    SContentBody(std::string b, std::vector<SChoice> c)
+    ContentBody(std::string b, std::vector<Choice> c)
         : body(b), choices(c), sound(0), withSound(false), withChoices(true) {}
 
-    SContentBody(std::string b)
+    ContentBody(std::string b)
         : body(b), sound(0), withSound(false), withChoices(false) {}
 
     std::string play() const
@@ -167,23 +170,23 @@ class SContentBody
     }
 };
 
-class SStory
+class Story
 {
   protected:
-    std::unordered_map<std::string, std::vector<SContentBody>> scenes;
+    std::unordered_map<std::string, std::vector<ContentBody>> scenes;
     std::string label;
 
   public:
-    SStory() {}
+    Story() {}
 
-    void addScene(std::string l, std::vector<SContentBody> scene)
+    void addScene(std::string l, std::vector<ContentBody> scene)
     {
         scenes[l] = scene;
     }
 
     void play()
     {
-        std::vector<SContentBody> currentScene;
+        std::vector<ContentBody> currentScene;
         std::string currentLabel = "START";
         const std::string endLabel = "END";
         while (currentLabel.compare(endLabel) != 0)
@@ -205,5 +208,6 @@ class SStory
         std::cout << "The End." << std::endl;
     }
 };
+}
 
 #endif //SStory_h

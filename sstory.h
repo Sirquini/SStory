@@ -120,12 +120,12 @@ class ContentBody
         }
         if (withChoices)
         {
-            int nChoices = choices.size();
+            int nChoices = 0;
             int uInput = 0;
 
-            for (int i = 0; i < nChoices; ++i)
+            for (const auto &choice : choices)
             {
-                choices[i].print(i + 1);
+                choice.print(++nChoices);
             }
             uInput = read_choice(nChoices);
             /* 

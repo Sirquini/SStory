@@ -19,54 +19,54 @@
 // Sound handling with OpenAl
 #include "ssound.h"
 
-class SText {
+class SText
+{
     //! Basic String Wrapper
-protected:
+  protected:
     std::string body;
-public:
+
+  public:
     SText(std::string s)
-    : body(s)
-    {}
+        : body(s) {}
     //! Prints the body text in standar output
-    void print () const
+    void print() const
     {
         std::cout << body << std::endl;
     }
 
-    void pprint (std::string prepend) const
+    void pprint(std::string prepend) const
     {
         std::cout << prepend << " : " << body << std::endl;
     }
 
-    void pprint (SText prepend) const
+    void pprint(SText prepend) const
     {
         std::cout << prepend.body << " : " << body << std::endl;
     }
 
-    void pprint (int prepend) const
+    void pprint(int prepend) const
     {
         std::cout << prepend << " : " << body << std::endl;
     }
 };
 
-class SChoice {
+class SChoice
+{
     //! Abstraction for the notion of multiple choices in a text adventure game.
-protected:
+  protected:
     std::string label;
     SText displayText;
     SText complement;
-    bool  withComplement;
+    bool withComplement;
 
-public:
-    SChoice (std::string l, std::string dt, std::string c)
-    : label(l), displayText(dt), complement(c), withComplement(true)
-    {}
+  public:
+    SChoice(std::string l, std::string dt, std::string c)
+        : label(l), displayText(dt), complement(c), withComplement(true) {}
 
-    SChoice (std::string l, std::string dt)
-    : label(l), displayText(dt), complement(""), withComplement(false)
-    {}
+    SChoice(std::string l, std::string dt)
+        : label(l), displayText(dt), complement(""), withComplement(false) {}
 
-    void print (int n) const
+    void print(int n) const
     {
         displayText.pprint(n);
     }
@@ -76,37 +76,37 @@ public:
         if (withComplement)
         {
             complement.pprint(displayText);
-        } else {
+        }
+        else
+        {
             displayText.print();
         }
         return label;
     }
 };
 
-class SContentBody {
+class SContentBody
+{
     //! The basic structure of a Sub Scene
-protected:
+  protected:
     SText body;
-    std::vector< SChoice > choices;
+    std::vector<SChoice> choices;
     SSound::Sound sound;
     bool withSound;
     bool withChoices;
-public:
-    SContentBody (std::string b, std::vector<SChoice> c, int s)
-    : body(b), choices(c), sound(s), withSound(true), withChoices(true)
-    {}
 
-    SContentBody (std::string b, int s)
-    : body(b), sound(s), withSound(true), withChoices(false)
-    {}
+  public:
+    SContentBody(std::string b, std::vector<SChoice> c, int s)
+        : body(b), choices(c), sound(s), withSound(true), withChoices(true) {}
 
-    SContentBody (std::string b, std::vector<SChoice> c)
-    : body(b), choices(c), sound(0), withSound(false), withChoices(true)
-    {}
+    SContentBody(std::string b, int s)
+        : body(b), sound(s), withSound(true), withChoices(false) {}
 
-    SContentBody (std::string b)
-    : body(b), sound(0), withSound(false), withChoices(false)
-    {}
+    SContentBody(std::string b, std::vector<SChoice> c)
+        : body(b), choices(c), sound(0), withSound(false), withChoices(true) {}
+
+    SContentBody(std::string b)
+        : body(b), sound(0), withSound(false), withChoices(false) {}
 
     std::string play() const
     {
@@ -120,9 +120,9 @@ public:
             int nChoices = choices.size();
             int uInput = 0;
 
-            for(int i = 0; i < nChoices; ++i)
+            for (int i = 0; i < nChoices; ++i)
             {
-                choices[i].print(i+1);
+                choices[i].print(i + 1);
             }
             uInput = read_choice(nChoices);
             /* Unvalidated input, generates loop on invalid input
@@ -136,24 +136,30 @@ public:
             // Ignore the never read newline character.
             std::cin.ignore();
             return choices[uInput - 1].execute();
-        } else {
+        }
+        else
+        {
             std::cout << "...";
             std::cin.ignore();
         }
         return "END";
     }
 
-private:
+  private:
     //! Utility to validated user input and avoid undefined behaviour.
     int read_choice(int max) const
     {
         int uInput = 0;
-        while (true) {
+        while (true)
+        {
             std::cout << "> ";
-            if(std::cin >> uInput){
+            if (std::cin >> uInput)
+            {
                 if (uInput > 0 && uInput <= max)
                     return uInput;
-            } else {
+            }
+            else
+            {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
@@ -161,21 +167,23 @@ private:
     }
 };
 
-class SStory {
-protected:
-    std::unordered_map< std::string,  std::vector< SContentBody > > scenes;
+class SStory
+{
+  protected:
+    std::unordered_map<std::string, std::vector<SContentBody>> scenes;
     std::string label;
-public:
+
+  public:
     SStory() {}
 
-    void addScene (std::string l, std::vector<SContentBody> scene)
+    void addScene(std::string l, std::vector<SContentBody> scene)
     {
         scenes[l] = scene;
     }
 
     void play()
     {
-        std::vector< SContentBody > currentScene;
+        std::vector<SContentBody> currentScene;
         std::string currentLabel = "START";
         const std::string endLabel = "END";
         while (currentLabel.compare(endLabel) != 0)
@@ -188,7 +196,7 @@ public:
             {
                 currentScene = scenes[currentLabel];
                 int nContent = currentScene.size();
-                for(int i = 0; i < nContent; ++i)
+                for (int i = 0; i < nContent; ++i)
                 {
                     currentLabel = currentScene[i].play();
                 }

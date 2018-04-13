@@ -15,6 +15,7 @@
 #include <vector>
 #include <unordered_map>
 #include <limits>
+#include <utility>
 
 // Sound handling with OpenAl
 #include "ssound.h"
@@ -31,6 +32,8 @@ class Text
   public:
     Text(const std::string &s)
         : body(s) {}
+    Text(std::string &&s)
+        : body(std::move(s)) {}
     Text(const char *s)
         : body(s) {}
     //! Prints the body text in standar output
@@ -178,14 +181,13 @@ class Story
 {
   protected:
     std::unordered_map<std::string, std::vector<ContentBody>> scenes;
-    std::string label;
 
   public:
     Story() {}
 
     void addScene(std::string l, std::vector<ContentBody> scene)
     {
-        scenes[l] = scene;
+        scenes[l] = std::move(scene);
     }
 
     void play()

@@ -68,11 +68,11 @@ class Choice
     bool withComplement;
 
   public:
-    Choice(std::string l, std::string dt, std::string c)
-        : label(l), displayText(dt), complement(c), withComplement(true) {}
+    Choice(std::string l, Text dt, Text c)
+        : label(l), displayText(std::move(dt)), complement(std::move(c)), withComplement(true) {}
 
-    Choice(std::string l, std::string dt)
-        : label(l), displayText(dt), complement(""), withComplement(false) {}
+    Choice(std::string l, Text dt)
+        : label(l), displayText(std::move(dt)), complement(""), withComplement(false) {}
 
     void print(int n) const
     {

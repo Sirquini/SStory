@@ -29,7 +29,9 @@ class Text
     std::string body;
 
   public:
-    Text(std::string s)
+    Text(const std::string &s)
+        : body(s) {}
+    Text(const char *s)
         : body(s) {}
     //! Prints the body text in standar output
     void print() const

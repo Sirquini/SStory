@@ -9,11 +9,22 @@
 #ifndef SSound_h
 #define SSound_h
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 // OpenAl libraries
 #include <AL/alut.h>
 
 namespace SSound
 {
+
+struct Point
+{
+    ALfloat x;
+    ALfloat y;
+    ALfloat z;
+};
 
 class Buffer
 {
@@ -21,70 +32,59 @@ class Buffer
     // Buffer to hold sound data
     ALuint buffer;
 
-    Buffer(std::string path)
+    Buffer(const std::string &path)
     {
-        // Variables to load into.
-
-        ALenum format;
-        ALsizei size;
-        ALvoid *data;
-        ALsizei freq;
-        ALboolean loop;
-
-        // Load wav data into buffers.
-        //std::cout << "Loaded buffer " << path << std::endl;
-        alGenBuffers(1, &buffer);
-
-        alutLoadWAVFile((ALbyte *)path.c_str(), &format, &data, &size, &freq, &loop);
-        alBufferData(buffer, format, data, size, freq);
-        alutUnloadWAV(format, data, size, freq);
+        // Load wav data into buffer.
+        buffer = alutCreateBufferFromFile(path.c_str());
+        ALenum error = alutGetError();
+        if (error != ALUT_ERROR_NO_ERROR)
+        {
+            std::clog << "Alut Error: " << alutGetErrorString(error) << " for file: " << path << std::endl;
+        }
     }
 };
 
 class Source
 {
-  public:
     // Sources are points of emitting sound.
-    ALuint source;
-    ALfloat pos_x;
-    ALfloat pos_y;
-    ALfloat pos_z;
-    ALfloat vel_x;
-    ALfloat vel_y;
-    ALfloat vel_z;
+  private:
+    Point pos;
+    Point vel;
 
-    Source(ALfloat mp_x, ALfloat mp_y, ALfloat mp_z, ALfloat mv_x, ALfloat mv_y, ALfloat mv_z, bool loop = false)
-        : pos_x(mp_x), pos_y(mp_y), pos_z(mp_z), vel_x(mv_x), vel_y(mv_y), vel_z(mv_z)
+  public:
+    ALuint source;
+
+    Source(Point position, Point velocity, bool loop = false)
+        : pos(position), vel(velocity)
     {
         alGenSources(1, &source);
 
         alSourcef(source, AL_PITCH, 1.0f);
         alSourcef(source, AL_GAIN, 1.0f);
-        alSource3f(source, AL_POSITION, pos_x, pos_y, pos_z);
-        alSource3f(source, AL_VELOCITY, vel_x, vel_y, vel_z);
+        alSource3f(source, AL_POSITION, pos.x, pos.y, pos.z);
+        alSource3f(source, AL_VELOCITY, vel.x, vel.y, vel.z);
         if (loop)
             alSourcei(source, AL_LOOPING, AL_TRUE);
         else
             alSourcei(source, AL_LOOPING, AL_FALSE);
     }
 
-    ALboolean addBuffer(Buffer sbuffer)
+    ALboolean addBuffer(Buffer sbuffer) const
     {
         alSourcei(source, AL_BUFFER, sbuffer.buffer);
-        // Do another error check and return.
 
+        // Do another error check and return.
         if (alGetError() != AL_NO_ERROR)
             return AL_FALSE;
-
         return AL_TRUE;
     }
 
-    void stop()
+    void stop() const
     {
         alSourceStop(source);
     }
 
-    void play()
+    void play() const
     {
         alSourcePlay(source);
     }
@@ -93,22 +93,45 @@ class Source
 class Listener
 {
   private:
-    ALfloat pos_x;
-    ALfloat pos_y;
-    ALfloat pos_z;
-    ALfloat vel_x;
-    ALfloat vel_y;
-    ALfloat vel_z;
+    Point pos;
+    Point vel;
 
   public:
-    Listener(ALfloat mp_x, ALfloat mp_y, ALfloat mp_z, ALfloat mv_x, ALfloat mv_y, ALfloat mv_z)
-        : pos_x(mp_x), pos_y(mp_y), pos_z(mp_z), vel_x(mv_x), vel_y(mv_y), vel_z(mv_z)
+    Listener(Point position, Point velocity)
+        : pos(position), vel(velocity)
     {
         ALfloat orientation[6] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
-        alListener3f(AL_POSITION, pos_x, pos_y, pos_z);
-        alListener3f(AL_VELOCITY, vel_x, vel_y, vel_z);
+        alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+        alListener3f(AL_VELOCITY, vel.x, vel.y, vel.z);
         alListenerfv(AL_ORIENTATION, orientation);
     }
+};
+
+enum class Channel
+{
+    background,
+    right,
+    left,
+    center
+};
+
+enum class Sample
+{
+    attack,
+    birds,
+    driving,
+    engine_off,
+    engine_on,
+    forest,
+    growl,
+    gun,
+    howl_right,
+    howl_left,
+    piano,
+    river,
+    walking,
+    wolf,
+    carby
 };
 
 class SoundMaster
@@ -117,36 +140,57 @@ class SoundMaster
     std::vector<Buffer> buffers;
     std::vector<Source> sources;
     Listener listener;
-    const std::string base_path = "/Users/estudiantes/Documents/interaccion/JuegoInteractivo/JuegoInteractivo/sounds/";
+    const std::string base_path = "sounds/"; // Relative to the executable.
+
+    enum class Sample
+    {
+        attack,
+        birds,
+        driving,
+        engine_off,
+        engine_on,
+        forest,
+        growl,
+        gun,
+        howl,
+        piano,
+        river,
+        walking,
+        wolf,
+        carby
+    };
 
   public:
     SoundMaster()
-        : listener(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        : listener({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0})
     {
-        alutInit(NULL, 0);
-        alGetError();
+        alutInit(NULL, NULL);
+        alutGetError();
 
         // Create some sources for later use
-        sources.push_back(Source(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true)); //Center for bg music
-        sources.push_back(Source(1.0, 1.0, 0.0, 0.0, 0.0, 0.0));       //Right
-        sources.push_back(Source(-1.0, 1.0, 0.0, 0.0, 0.0, 0.0));      //Left
-        sources.push_back(Source(0.0, 0.0, 0.0, 0.0, 0.0, 0.0));       //Center
+        sources = {
+            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, true), //Center for bg music
+            Source({1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),       //Right
+            Source({-1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),      //Left
+            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0})        //Center
+        };
 
         // Load all buffers
-        buffers.push_back(Buffer(base_path + "attack.wav"));
-        buffers.push_back(Buffer(base_path + "birds.wav"));
-        buffers.push_back(Buffer(base_path + "driving.wav"));
-        buffers.push_back(Buffer(base_path + "engine_off.wav"));
-        buffers.push_back(Buffer(base_path + "engine_on.wav"));
-        buffers.push_back(Buffer(base_path + "forest.wav"));
-        buffers.push_back(Buffer(base_path + "growl.wav"));
-        buffers.push_back(Buffer(base_path + "gun1.wav"));
-        buffers.push_back(Buffer(base_path + "howl.wav"));
-        buffers.push_back(Buffer(base_path + "piano.wav"));
-        buffers.push_back(Buffer(base_path + "river.wav"));
-        buffers.push_back(Buffer(base_path + "walking.wav"));
-        buffers.push_back(Buffer(base_path + "wolf.wav"));
-        buffers.push_back(Buffer(base_path + "win_car_by.wav"));
+        buffers = {
+            Buffer(base_path + "attack.wav"),
+            Buffer(base_path + "birds.wav"),
+            Buffer(base_path + "driving.wav"),
+            Buffer(base_path + "engine_off.wav"),
+            Buffer(base_path + "engine_on.wav"),
+            Buffer(base_path + "forest.wav"),
+            Buffer(base_path + "growl.wav"),
+            Buffer(base_path + "gun1.wav"),
+            Buffer(base_path + "howl.wav"),
+            Buffer(base_path + "piano.wav"),
+            Buffer(base_path + "river.wav"),
+            Buffer(base_path + "walking.wav"),
+            Buffer(base_path + "wolf.wav"),
+            Buffer(base_path + "win_car_by.wav")};
     }
 
     std::string path(std::string song)
@@ -154,113 +198,92 @@ class SoundMaster
         return base_path + song;
     }
 
-    void attack()
+    void play(Sample sound, Channel channel) const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[0]);
-        sources[3].play();
+        int source = static_cast<int>(channel);
+        int buffer = static_cast<int>(sound);
+
+        sources[source].stop();
+        sources[source].addBuffer(buffers[buffer]);
+        sources[source].play();
     }
 
-    void birds()
+    void attack() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[1]);
-        sources[3].play();
+        play(Sample::attack, Channel::center);
     }
 
-    void driving()
+    void birds() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[2]);
-        sources[3].play();
+        play(Sample::birds, Channel::center);
     }
 
-    void engine_off()
+    void driving() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[3]);
-        sources[3].play();
+        play(Sample::driving, Channel::center);
     }
 
-    void engine_on()
+    void engine_off() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[4]);
-        sources[3].play();
+        play(Sample::engine_off, Channel::center);
     }
 
-    void forest()
+    void engine_on() const
     {
-        sources[0].stop();
-        sources[0].addBuffer(buffers[5]);
-        sources[0].play();
+        play(Sample::engine_on, Channel::center);
     }
 
-    void gun()
+    void forest() const
     {
-        sources[1].stop();
-        sources[1].addBuffer(buffers[7]);
-        sources[1].play();
+        play(Sample::forest, Channel::background);
     }
 
-    void growl()
+    void gun() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[6]);
-        sources[3].play();
+        play(Sample::gun, Channel::right);
     }
 
-    void howl()
+    void growl() const
     {
-        sources[1].stop();
-        sources[1].addBuffer(buffers[8]);
-        sources[1].play();
+        play(Sample::growl, Channel::center);
     }
 
-    void howl2()
+    void howl() const
     {
-        sources[1].stop();
-        sources[2].stop();
-        sources[2].addBuffer(buffers[8]);
-        sources[2].play();
+        play(Sample::howl, Channel::right);
     }
 
-    void piano()
+    void howl2() const
     {
-        sources[0].stop();
-        sources[0].addBuffer(buffers[9]);
-        sources[0].play();
+        play(Sample::howl, Channel::left);
     }
 
-    void river()
+    void piano() const
     {
-        sources[2].stop();
-        sources[2].addBuffer(buffers[10]);
-        sources[2].play();
+        play(Sample::piano, Channel::background);
     }
 
-    void walking()
+    void river() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[11]);
-        sources[3].play();
+        play(Sample::river, Channel::left);
     }
 
-    void wolf()
+    void walking() const
     {
-        sources[0].stop();
-        sources[0].addBuffer(buffers[12]);
-        sources[0].play();
+        play(Sample::walking, Channel::center);
     }
 
-    void carby()
+    void wolf() const
     {
-        sources[3].stop();
-        sources[3].addBuffer(buffers[13]);
-        sources[3].play();
+        play(Sample::wolf, Channel::background);
     }
 
-    void KillALData()
+    void carby() const
+    {
+        play(Sample::carby, Channel::center);
+    }
+
+    void killALData()
     {
         for (int i = 0; i < buffers.size(); ++i)
         {
@@ -275,7 +298,7 @@ class SoundMaster
 
     ~SoundMaster()
     {
-        KillALData();
+        killALData();
     }
 };
 
@@ -285,71 +308,71 @@ class Sound
 {
   private:
     //! Helper for calling predefine sound effects
-    int sound_type;
+    Sample sound_type;
 
   public:
-    Sound(int m_type) : sound_type(m_type) {}
+    Sound(Sample m_type) : sound_type(m_type) {}
     void play() const
     {
         switch (sound_type)
         {
-        case 0:
+        case Sample::attack :
             MASTER.attack();
             break;
 
-        case 1:
+        case Sample::birds:
             MASTER.birds();
             break;
 
-        case 2:
+        case Sample::driving:
             MASTER.driving();
             break;
 
-        case 3:
+        case Sample::engine_off:
             MASTER.engine_off();
             break;
 
-        case 4:
+        case Sample::engine_on:
             MASTER.engine_on();
             break;
 
-        case 5:
+        case Sample::forest:
             MASTER.forest();
             break;
 
-        case 6:
+        case Sample::growl:
             MASTER.growl();
             break;
 
-        case 7:
+        case Sample::gun:
             MASTER.gun();
             break;
 
-        case 8:
+        case Sample::howl_right:
             MASTER.howl();
             break;
 
-        case 9:
+        case Sample::piano:
             MASTER.piano();
             break;
 
-        case 10:
+        case Sample::river:
             MASTER.river();
             break;
 
-        case 11:
+        case Sample::walking:
             MASTER.walking();
             break;
 
-        case 12:
+        case Sample::wolf:
             MASTER.wolf();
             break;
 
-        case 13:
+        case Sample::howl_left:
             MASTER.howl2();
             break;
 
-        case 14:
+        case Sample::carby:
             MASTER.carby();
             break;
 
@@ -359,6 +382,6 @@ class Sound
         }
     }
 };
-}
+} // namespace SSound;
 
 #endif // SSound_h

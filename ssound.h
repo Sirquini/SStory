@@ -19,6 +19,12 @@
 namespace SSound
 {
 
+#ifndef SSOUND_DEBUG
+constexpr bool show_errors = false;
+#else
+constexpr bool show_errors = true;
+#endif // SSOUND_DEBUG
+
 struct Point
 {
     ALfloat x;
@@ -37,9 +43,9 @@ class Buffer
         // Load wav data into buffer.
         buffer = alutCreateBufferFromFile(path.c_str());
         ALenum error = alutGetError();
-        if (error != ALUT_ERROR_NO_ERROR)
+        if (show_errors && error != ALUT_ERROR_NO_ERROR)
         {
-            std::clog << "Alut Error: " << alutGetErrorString(error) << " for file: " << path << std::endl;
+            std::cerr << "ALUT(EE): " << alutGetErrorString(error) << " for file: " << path << std::endl;
         }
     }
 };
@@ -77,6 +83,11 @@ class Source
         if (alGetError() != AL_NO_ERROR)
             return AL_FALSE;
         return AL_TRUE;
+    }
+
+    void removeBuffer() const
+    {
+        alSourcei(source, AL_BUFFER, 0);
     }
 
     void stop() const
@@ -137,8 +148,8 @@ enum class Sample
 class SoundMaster
 {
   private:
-    std::vector<Buffer> buffers;
     std::vector<Source> sources;
+    std::vector<Buffer> buffers;
     Listener listener;
     const std::string base_path = "sounds/"; // Relative to the executable.
 
@@ -169,11 +180,10 @@ class SoundMaster
 
         // Create some sources for later use
         sources = {
-            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, true), //Center for bg music
-            Source({1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),       //Right
-            Source({-1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),      //Left
-            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0})        //Center
-        };
+            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, true), // Center for bg music
+            Source({1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),       // Right
+            Source({-1.0, 1.0, 0.0}, {0.0, 0.0, 0.0}),      // Left
+            Source({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0})};      // Center
 
         // Load all buffers
         buffers = {
@@ -283,22 +293,17 @@ class SoundMaster
         play(Sample::carby, Channel::center);
     }
 
-    void killALData()
-    {
-        for (int i = 0; i < buffers.size(); ++i)
-        {
-            alDeleteBuffers(1, &(buffers[i].buffer));
-        }
-        for (int i = 0; i < sources.size(); ++i)
-        {
-            alDeleteSources(1, &(sources[i].source));
-        }
-        alutExit();
-    }
-
     ~SoundMaster()
     {
-        killALData();
+        for (const auto &source : sources)
+        {
+            alDeleteSources(1, &(source.source));
+        }
+        for (const auto &buffer : buffers)
+        {
+            alDeleteBuffers(1, &(buffer.buffer));
+        }
+        alutExit();
     }
 };
 
@@ -316,7 +321,7 @@ class Sound
     {
         switch (sound_type)
         {
-        case Sample::attack :
+        case Sample::attack:
             MASTER.attack();
             break;
 

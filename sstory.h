@@ -104,11 +104,11 @@ class ContentBody
     bool withChoices;
 
   public:
-    ContentBody(Text b, std::vector<Choice> c, SSound::Sample s)
-        : body(std::move(b)), choices(std::move(c)), sound(s), withSound(true), withChoices(true) {}
+    ContentBody(Text b, std::vector<Choice> c, SSound::Sample s, SSound::Channel ch = SSound::Channel::center)
+        : body(std::move(b)), choices(std::move(c)), sound(s, ch), withSound(true), withChoices(true) {}
 
-    ContentBody(Text b, SSound::Sample s)
-        : body(std::move(b)), sound(s), withSound(true), withChoices(false) {}
+    ContentBody(Text b, SSound::Sample s, SSound::Channel ch = SSound::Channel::center)
+        : body(std::move(b)), sound(s, ch), withSound(true), withChoices(false) {}
 
     ContentBody(Text b, std::vector<Choice> c)
         : body(std::move(b)), choices(std::move(c)), sound(SSound::Sample::attack), withSound(false), withChoices(true) {}

@@ -69,10 +69,10 @@ class Choice
 
   public:
     Choice(std::string l, Text dt, Text c)
-        : label(l), displayText(std::move(dt)), complement(std::move(c)), withComplement(true) {}
+        : label(std::move(l)), displayText(std::move(dt)), complement(std::move(c)), withComplement(true) {}
 
     Choice(std::string l, Text dt)
-        : label(l), displayText(std::move(dt)), complement(""), withComplement(false) {}
+        : label(std::move(l)), displayText(std::move(dt)), complement(""), withComplement(false) {}
 
     void print(int n) const
     {
@@ -126,26 +126,15 @@ class ContentBody
         if (withChoices)
         {
             int nChoices = 0;
-            int uInput = 0;
-
             for (const auto &choice : choices)
             {
                 choice.print(++nChoices);
             }
-            uInput = read_choice(nChoices);
-            /* 
-            // Unvalidated input, generates loop on invalid input
-            while (uInput == 0)
-            {
-                std::cout << "> ";
-                std::cin >> uInput;
-                if(uInput < 0 || uInput > nChoices )
-                    uInput = 0;
-            }
-            */
+
+            const int uInput = read_choice(nChoices);
             // Ignore the never read newline character.
             std::cin.ignore();
-            return choices[uInput - 1].execute();
+            return choices[uInput].execute();
         }
         else
         {
@@ -166,7 +155,7 @@ class ContentBody
             if (std::cin >> uInput)
             {
                 if (uInput > 0 && uInput <= max)
-                    return uInput;
+                    return uInput - 1;
             }
             else
             {
@@ -192,7 +181,6 @@ class Story
 
     void play()
     {
-        std::vector<ContentBody> currentScene;
         std::string currentLabel = "START";
         const std::string endLabel = "END";
         while (currentLabel.compare(endLabel) != 0)
@@ -203,7 +191,7 @@ class Story
             }
             else
             {
-                currentScene = scenes[currentLabel];
+                const std::vector<ContentBody> currentScene = scenes[currentLabel];
                 for (const auto &content : currentScene)
                 {
                     currentLabel = content.play();
@@ -213,6 +201,6 @@ class Story
         std::cout << "The End." << std::endl;
     }
 };
-}
+} // namespace SStory;
 
-#endif //SStory_h
+#endif // SStory_h

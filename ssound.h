@@ -42,7 +42,7 @@ class Buffer
     {
         // Load wav data into buffer.
         buffer = alutCreateBufferFromFile(path.c_str());
-        ALenum error = alutGetError();
+        const ALenum error = alutGetError();
         if (show_errors && error != ALUT_ERROR_NO_ERROR)
         {
             std::cerr << "ALUT(EE): " << alutGetErrorString(error) << " for file: " << path << '\n';
@@ -75,7 +75,7 @@ class Source
             alSourcei(source, AL_LOOPING, AL_FALSE);
     }
 
-    ALboolean addBuffer(Buffer sbuffer) const
+    ALboolean addBuffer(const Buffer &sbuffer) const
     {
         alSourcei(source, AL_BUFFER, sbuffer.buffer);
 
@@ -191,8 +191,8 @@ class SoundMaster
 
     void play(Sample sound, Channel channel) const
     {
-        int source = static_cast<int>(channel);
-        int buffer = static_cast<int>(sound);
+        const int source = static_cast<int>(channel);
+        const int buffer = static_cast<int>(sound);
 
         sources[source].stop();
         sources[source].addBuffer(buffers[buffer]);

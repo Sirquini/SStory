@@ -1,10 +1,8 @@
-/*
- * main.cpp
- * Interactive CLI Text Adventure using OpenAl for sounds.
+/* main.cpp
+ * Interactive CLI Text Adventure using OpenAl for sound.
  * 
  * Author: Santiago Quintero
  * Released under The MIT License
- *
  */
 
 #include "sstory.h"
@@ -13,7 +11,7 @@ int main ()
 {
     SStory::Story myStory;
 
-    // Test of the different feactures of SStory library.
+    // Test of the different feactures of SStory.
     myStory.addScene("START",
     {
         SStory::ContentBody("Es poco después de las 12 de la noche. Te encuentras manejando, en medio de la nada, camino a casa después de una reunión con tus viejos amigos en la ciudad vecina.", SSound::Sample::driving),

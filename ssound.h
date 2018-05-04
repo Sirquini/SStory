@@ -1,11 +1,10 @@
-/*
- * ssound.h
+/* ssound.h
  * Wrapper for OpenAl Sound manipulation.
  * 
  * Author: Santiago Quintero
  * Released under The MIT License
- *
  */
+
 #ifndef SSound_h
 #define SSound_h
 

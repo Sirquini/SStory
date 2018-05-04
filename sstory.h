@@ -1,10 +1,8 @@
-/*
- * sstory.h
+/* sstory.h
  * Interactive CLI Text Adventure creation library.
  * 
  * Author: Santiago Quintero
  * Released under The MIT License
- *
  */
 
 #ifndef SStory_h

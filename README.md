@@ -1,6 +1,8 @@
 SStory
 ====================
 
+[![C/C++ CI](https://github.com/Sirquini/SStory/actions/workflows/c-cpp.yml/badge.svg?branch=master)](https://github.com/Sirquini/SStory/actions/workflows/c-cpp.yml)
+
 A very basic header library for the creations of Interactive CLI Text Adventure Games.
 
 * Author: Santiago Quintero Pabón

@@ -8,34 +8,46 @@ A very basic header library for the creations of Interactive CLI Text Adventure 
 
 ## Building from source
 
+In general just run the Makefile to compile the provided example
+
+```
+make
+```
+
+To clean the generated executable run
+
+```
+make clean
+```
+
 ### Linux
 
-Tested on Ubuntu 16.04
+Tested on Ubuntu 18.04
 
-You will need OpenAL and Alut installed. In Ubuntu just run:
-
-```
-sudo apt-get install libopenal-dev libalut-dev
-```
-
-Remember to pass the `-lalut` and `-lopenal` flags for proper linking.
-
-For example, with Clang:
+You will need OpenAL and Alut installed. In Ubuntu run:
 
 ```
-clang++ -o ExGame -std=c++11 -Wall main.cpp main.cpp -lalut -lopenal
+sudo apt install libopenal-dev libalut-dev
+```
+
+Remember to pass the `-lalut` and `-lopenal` flags when linking.
+
+With Clang:
+
+```
+clang++ -o ExGame -std=c++11 -Wall main.cpp -lalut -lopenal
 ```
 
 ### Mac OS
 
-It is a lot easier to just use Xcode and open the Xcode project file and build from there.
+You may want to use Xcode and build from there.
 
 If the Xcode console doesn't respond to the enter key, open the generated executable directly.
 
 If there are linking errors, then the OpenAL.framework is not imported in the project. It must be added to the Link Binary with libraries Build Phase.
 
-If there are include errors about alut.h, try using the included alut.h, changing the include line in SSound.h. Or you can install freealut.
+If there are _include_ errors about alut.h, try using the included alut.h by changing the include line in SSound.h. Or you can install freealut.
 
 ## Note
 
-If there is no sound, remember to point the base_path of SSoundMaster (in ssound.h) to the appropiated absolute path. This path is relative to the generated executable.
+If there is no sound, remember to point the `base_path` of `SSoundMaster` (in ssound.h) to the appropiated path. This path is relative to the generated executable.

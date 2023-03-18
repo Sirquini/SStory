@@ -1,0 +1,21 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install clang and dependencies
+      run: sudo apt install -y clang libopenal-dev libalut-dev
+    - name: configure
+      run: ./configure
+    - name: make
+      run: make
